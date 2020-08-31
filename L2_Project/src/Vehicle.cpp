@@ -61,12 +61,11 @@ void Vehicle::drive()
             i2 = _currDestination;
             i1 = i2->getID() == _currStreet->getInIntersection()->getID() ? _currStreet->getOutIntersection() : _currStreet->getInIntersection();
 
-            double x1, y1, x2, y2, xv, yv, dx, dy, l;
+            double x1, y1, x2, y2, xv, yv, dx, dy;
             i1->getPosition(x1, y1);
             i2->getPosition(x2, y2);
             dx = x2 - x1;
             dy = y2 - y1;
-            l = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (x1 - x2));
             xv = x1 + completion * dx; // new position based on line equation in parameter form
             yv = y1 + completion * dy;
             this->setPosition(xv, yv);
@@ -77,7 +76,8 @@ void Vehicle::drive()
                 // Task L2.1 : Start up a task using std::async which takes a reference to the method Intersection::addVehicleToQueue, 
                 // the object _currDestination and a shared pointer to this using the get_shared_this() function. 
                 // Then, wait for the data to be available before proceeding to slow down.
-
+                std::future<void> ftr = std::async(&Intersection::addVehicleToQueue, _currDestination, get_shared_this());
+                ftr.get();
                 // slow down and set intersection flag
                 _speed /= 10.0;
                 hasEnteredIntersection = true;
